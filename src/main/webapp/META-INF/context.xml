@@ -1,0 +1,7 @@
+<Context>
+    <!-- DataSource management from tomcat (reference created in web.xml) -->
+    <Resource name="jdbc/TestingRest-db" auth="Container" type="javax.sql.DataSource"
+              maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+              driverClassName="org.h2.Driver" url="jdbc:h2:file:C:\Users\Gebruiker\IdeaProjects\TemplateRestApi\TestingRest-db"
+              removeAbandoned="true" removeAbandonedTimeout="60" />
+</Context>

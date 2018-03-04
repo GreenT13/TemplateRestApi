@@ -1,0 +1,84 @@
+<web-app>
+    <display-name>My first rest easy webservice</display-name>
+
+    <!-- START: Only needed for local builds!! -->
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+        <init-param>
+            <param-name>cors.allowed.headers</param-name>
+            <!-- Default headers plus header for authorization, otherwise angular request will be rejected. -->
+            <param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,
+                Authorization</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+    <!-- END: Only needed for local builds!! -->
+
+    <!-- START: Handle exceptions -->
+    <context-param>
+        <param-name>resteasy.providers</param-name>
+        <param-value>com.apon.exceptionhandler.ExceptionHandler</param-value>
+    </context-param>
+    <!-- END: Handle exceptions -->
+
+    <!-- START: AOP configuration -->
+    <!-- Module that configures the actual bindings -->
+    <context-param>
+        <param-name>resteasy.guice.modules</param-name>
+        <param-value>com.apon.guice.BinderModule</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener
+        </listener-class>
+    </listener>
+    <!-- Servlet that initializes the module -->
+    <servlet>
+        <servlet-name>Resteasy</servlet-name>
+        <servlet-class>
+            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+        </servlet-class>
+    </servlet>
+    <!-- Make sure we use the servlet so all the binding happends -->
+    <servlet-mapping>
+        <servlet-name>Resteasy</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <!-- END: AOP configuration -->
+
+    <!-- START: Apache Shiro security -->
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+    <!-- END: Apache Shiro security -->
+
+    <!-- START: DataSource management from tomcat (resource created in context.xml) -->
+    <resource-ref>
+        <res-ref-name>jdbc/TestingRest-db</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <injection-target>
+            <injection-target-class>com.apon.service.MessageService</injection-target-class>
+            <injection-target-name>dataSource</injection-target-name>
+        </injection-target>
+    </resource-ref>
+    <!-- END: DataSource management -->
+</web-app>
